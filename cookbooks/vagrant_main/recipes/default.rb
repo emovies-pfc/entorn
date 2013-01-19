@@ -41,8 +41,11 @@ execute "disable-default-site" do
   notifies :reload, resources(:service => "apache2"), :delayed
 end
 
-web_app "project" do
-  template "project.conf.erb"
+web_app "e-movies" do
+  server_name "e-movies.local"
+  server_aliases ["www.e-movies.local"]
+  docroot "/vagrant/emovies-web/approot"
+  cookbook "apache2"
   notifies :reload, resources(:service => "apache2"), :delayed
 end
 
