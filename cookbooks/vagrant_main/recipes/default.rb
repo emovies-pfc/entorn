@@ -71,3 +71,7 @@ template "#{node['vagrant_main']['php']['apache_conf_dir']}/php.ini" do
   mode "0644"
   notifies :reload, resources(:service => "apache2"), :delayed
 end
+
+execute "create-database" do
+  command "mysql -u root -p#{node[:mysql][:server_root_password]} -e \"CREATE DATABASE IF NOT EXISTS emovie\""
+end
