@@ -16,6 +16,7 @@ include_recipe "mysql"
 include_recipe "mysql::server"
 include_recipe "apache2::mod_php5"
 include_recipe "git"
+include_recipe "memcached"
 
 package "curl" do
     action :install
@@ -31,6 +32,10 @@ end
 
 package "php-apc" do
 	action :install
+end
+
+package "php5-memcached" do
+  action :install
 end
 
 package "vim" do
