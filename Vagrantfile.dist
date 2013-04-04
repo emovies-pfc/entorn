@@ -15,6 +15,10 @@ Vagrant::Config.run do |config|
 
   # Boot with a GUI so you can see the screen. (Default is headless)
   # config.vm.boot_mode = :gui
+  config.vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+  config.vm.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+  config.vm.share_folder "v-root", "/vagrant", ".", :nfs => true
+  config.vm.network :hostonly, "10.10.50.10"
 
   # Assign this VM to a host-only network IP, allowing you to access it
   # via the IP. Host-only networks can talk to the host machine as well as
