@@ -50,28 +50,6 @@ package "php5-xdebug" do
 	action :install
 end
 
-execute "download-composer" do
-    command "curl -s https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer"
-    not_if {File.exists?("/usr/local/bin/composer")}
-end
-
-execute "update-composer" do
-    command "composer self-update"
-end
-
-execute "disable-default-site" do
-  command "sudo a2dissite default"
-  notifies :reload, resources(:service => "apache2"), :delayed
-end
-
-web_app "e-movies" do
-  server_name "e-movies.local"
-  server_aliases ["www.e-movies.local"]
-  docroot "/vagrant/emovies-web/approot"
-  cookbook "apache2"
-  notifies :reload, resources(:service => "apache2"), :delayed
-end
-
 template "#{node['vagrant_main']['php']['apache_conf_dir']}/php.ini" do
   source "php.ini.erb"
   cookbook "php"
@@ -79,6 +57,59 @@ template "#{node['vagrant_main']['php']['apache_conf_dir']}/php.ini" do
   group "root"
   mode "0644"
   notifies :reload, resources(:service => "apache2"), :delayed
+end
+
+if File.exists?("/usr/local/bin/composer")
+    execute "update-composer" do
+        command "composer self-update"
+    end
+else
+    execute "download-composer" do
+        command "curl -s https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer"
+    end
+end
+
+apache_site "default" do
+  enable false
+end
+
+execute "clone-emovies-project" do
+  command "git clone git://github.com/emovies-pfc/emovies-web.git /var/www"
+  only_if {(Dir.entries('/var/www') - %w{ . .. }).empty?}
+end
+
+execute "composer-install" do
+  command "composer install"
+  cwd "/var/www"
+end
+
+directory "/var/tmp/cache" do
+  owner node['apache']['user']
+  group node['apache']['group']
+end
+
+directory "/var/log/emovies" do
+  owner node['apache']['user']
+  group node['apache']['group']
+end
+
+execute "set-shared-permisions" do
+  command "setfacl -R -m u:#{node['apache']['user']}:rwX -m u:vagrant:rwX /var/tmp/cache /var/log/emovies && setfacl -dR -m u:#{node['apache']['user']}:rwx -m u:vagrant:rwx /var/tmp/cache /var/log/emovies"
+end
+
+link "/var/www/application/app/cache" do
+  to "/var/tmp/cache"
+end
+
+link "/var/www/application/app/logs" do
+  to "/var/log/emovies"
+end
+
+web_app "e-movies" do
+  server_name "e-movies.local"
+  server_aliases ["www.e-movies.local"]
+  docroot "/var/www/approot"
+  cookbook "apache2"
 end
 
 execute "create-database" do
