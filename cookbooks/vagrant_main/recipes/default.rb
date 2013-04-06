@@ -50,6 +50,10 @@ package "php5-xdebug" do
 	action :install
 end
 
+package "acl" do
+	action :install
+end
+
 template "#{node['vagrant_main']['php']['apache_conf_dir']}/php.ini" do
   source "php.ini.erb"
   cookbook "php"
@@ -78,11 +82,6 @@ execute "clone-emovies-project" do
   only_if {(Dir.entries('/var/www') - %w{ . .. }).empty?}
 end
 
-execute "composer-install" do
-  command "composer install"
-  cwd "/var/www"
-end
-
 directory "/var/tmp/cache" do
   owner node['apache']['user']
   group node['apache']['group']
@@ -103,6 +102,11 @@ end
 
 link "/var/www/application/app/logs" do
   to "/var/log/emovies"
+end
+
+execute "composer-install" do
+  command "composer install"
+  cwd "/var/www"
 end
 
 web_app "e-movies" do
