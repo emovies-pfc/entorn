@@ -22,3 +22,9 @@
 [submodule "cookbooks/java"]
 	path = cookbooks/java
 	url = git://github.com/opscode-cookbooks/java.git
+[submodule "cookbooks/supervisor"]
+	path = cookbooks/supervisor
+	url = git://github.com/opscode-cookbooks/supervisor.git
+[submodule "cookbooks/python"]
+	path = cookbooks/python
+	url = git://github.com/opscode-cookbooks/python.git
