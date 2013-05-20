@@ -82,26 +82,19 @@ execute "clone-emovies-project" do
   only_if {(Dir.entries('/var/www') - %w{ . .. }).empty?}
 end
 
-directory "/var/tmp/cache" do
+directory "/var/www/application/app/cache" do
   owner node['apache']['user']
   group node['apache']['group']
 end
 
-directory "/var/log/emovies" do
+directory "/var/www/application/app/logs" do
   owner node['apache']['user']
   group node['apache']['group']
 end
 
 execute "set-shared-permisions" do
-  command "setfacl -R -m u:#{node['apache']['user']}:rwX -m u:vagrant:rwX /var/tmp/cache /var/log/emovies && setfacl -dR -m u:#{node['apache']['user']}:rwx -m u:vagrant:rwx /var/tmp/cache /var/log/emovies"
-end
-
-link "/var/www/application/app/cache" do
-  to "/var/tmp/cache"
-end
-
-link "/var/www/application/app/logs" do
-  to "/var/log/emovies"
+  command "setfacl -R -m u:#{node['apache']['user']}:rwX -m u:vagrant:rwX /var/tmp/cache /var/log/emovies && setfacl -dR -m u:#{node['apache']['user']}:rwx -m u:vagrant:rwx /var/www/application/app/cache /var/www/application/app/logs"
+  returns [0, 1]
 end
 
 execute "composer-install" do
