@@ -149,6 +149,6 @@ execute "create-database" do
   command "mysql -u root -p#{node[:mysql][:server_root_password]} -e \"CREATE DATABASE IF NOT EXISTS emovie\""
 end
 
-supervisor_service "recommender" do
-	command "java -jar /vagrant/recomender-1.0-SNAPSHOT-jar-with-dependencies.jar"
-end
+#supervisor_service "recommender" do
+#	command "java -jar /vagrant/recomender-1.0-SNAPSHOT-jar-with-dependencies.jar"
+#end
